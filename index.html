@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Шпион — Party Game</title>
+<title>Словоблуд — Party Game</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, "Segoe UI", system-ui, sans-serif; background: #0f0c29; overflow-x: hidden; }
@@ -1070,12 +1070,12 @@ function StartScreen({ onStart }) {
   const validCount = count && parseInt(count) >= 2 && parseInt(count) <= 20;
 
   return e("div", { style: centerCol },
-    e("div", { style: { fontSize: "48px", marginBottom: "8px", textShadow: "0 0 40px rgba(255,100,100,0.5)" } }, "🕵️"),
+    e("div", { style: { fontSize: "48px", marginBottom: "8px", textShadow: "0 0 40px rgba(255,100,100,0.5)" } }, "🤪"),
     e("h1", { style: {
       color: "#fff", fontSize: "clamp(28px,6vw,42px)", fontWeight: 800, marginBottom: "4px",
       letterSpacing: "-1px", textAlign: "center", textTransform: "uppercase",
       background: GRAD_TITLE, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
-    }}, "Шпион"),
+    }}, "Словоблуд"),
     e("p", { style: { color: "rgba(255,255,255,0.5)", fontSize: "14px", marginBottom: "32px", letterSpacing: "3px", textTransform: "uppercase" } }, "Party Game"),
 
     step === "count" && e("div", { style: { width: "100%", maxWidth: "340px" } },
@@ -1252,7 +1252,7 @@ function GameScreen({ players, assignments, penaltyDeck, onRestart }) {
         e("h1", { style: {
           color: "#fff", fontSize: "24px", fontWeight: 800, marginBottom: "4px",
           background: GRAD_TITLE, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
-        }}, "🕵️ Игра идёт!"),
+        }}, "🤪 Игра идёт!"),
         e("p", { style: { color: "rgba(255,255,255,0.4)", fontSize: "13px" } },
           "Штрафных слов осталось: " + (penaltyDeck.length - penaltyIndex))
       ),
@@ -1309,7 +1309,7 @@ function GameScreen({ players, assignments, penaltyDeck, onRestart }) {
         border: "1px solid rgba(247,121,125,0.2)", marginBottom: "20px"
       }},
         e("div", { style: { color: "#f7797d", fontSize: "14px", fontWeight: 700, marginBottom: "12px", textAlign: "center", letterSpacing: "1px" } },
-          "⚡ ШТРАФ — не угадал шпиона"),
+          "⚡ ШТРАФ — не угадал словоблуда"),
         e("p", { style: { color: "rgba(255,255,255,0.4)", fontSize: "12px", textAlign: "center", marginBottom: "12px" } },
           "Кто не угадал — получает новое слово в наказание"),
         e("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "6px" } },
