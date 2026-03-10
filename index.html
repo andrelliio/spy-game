@@ -3297,6 +3297,35 @@ function StartScreen({ onStart, onBack }) {
   const [wordsPerPerson, setWordsPerPerson] = useState(5);
   const [step, setStep] = useState("count");
 
+  const NICKNAMES = [
+    "🦫 Бешеный Бобёр", "🦦 Хитрый Хорёк", "🐦 Дерзкий Дятел", "🐿️ Сонный Суслик", "🐧 Пьяный Пингвин",
+    "🫎 Ленивый Лось", "🦄 Нервный Нарвал", "🐶 Мутный Мопс", "🦒 Жирный Жираф", "🦭 Тухлый Тюлень",
+    "🦡 Буйный Барсук", "🐺 Шустрый Шакал", "🦀 Кривой Краб", "🦜 Потный Попугай", "🐬 Дикий Дельфин",
+    "🪿 Грозный Гусь", "🦭 Модный Морж", "🐒 Лютый Лемур", "🦞 Рыжий Рак", "🦨 Скользкий Скунс",
+    "🕊️ Чумовой Чайка", "🦛 Блатной Бегемот", "🦔 Ядерный Ёж", "🐍 Угрюмый Удав", "🐟 Свирепый Сом",
+    "🐦‍⬛ Вредный Ворон", "🐕 Пафосный Пёс", "🐱 Космический Кот", "🦬 Залётный Зубр", "🦏 Наглый Носорог",
+    "🐖 Токсичный Тапир", "🦅 Отбитый Орёл", "🫏 Мажорный Мул", "🐔 Фартовый Фазан", "🐤 Дерзкий Дрозд",
+    "🐢 Чёткий Черепаха", "🐏 Бодрый Баран", "🐹 Хмурый Хомяк", "🪶 Стрёмный Страус", "🐆 Резкий Рысь",
+    "🪽 Агрессивный Аист", "🐀 Крутой Крот", "🦩 Печальный Пеликан", "🦬 Борзый Бизон", "🐥 Загадочный Зяблик",
+    "🦝 Эпичный Енот", "🦣 Мощный Мамонт", "🐺 Весёлый Волк", "🐦 Тёмный Тукан", "🥚 Упоротый Утконос",
+    "🐻 Безумный Барибал", "🐆 Гламурный Гепард", "🐂 Яростный Як", "🦊 Ловкий Лис", "🦡 Романтичный Росомаха",
+    "🐿️ Суровый Сурикат", "🦫 Нежный Нутрия", "🐕 Дворовый Динго", "🦘 Кислый Кенгуру", "🐼 Плюшевый Панда",
+    "🪲 Железный Жук", "🐃 Бронзовый Бык", "🫏 Огненный Осёл", "🦁 Ледяной Лев", "🐃 Золотой Зебу",
+    "🐯 Турбо Тигр", "🐻 Мега Медведь", "🦆 Ультра Утка", "🦴 Гипер Гиена", "🦭 Нано Нерпа",
+    "🐺 Квантовый Койот", "🦌 Атомный Антилопа", "🦦 Вулканный Выдра", "🐭 Штормовой Шиншилла", "🐵 Бриллиантовый Бабуин",
+    "🦚 Платиновый Павлин", "🐖 Титановый Тапир", "🐆 Радиоактивный Рысь", "🦎 Магнитный Мангуст", "🐹 Лазерный Лемминг",
+    "🐆 Паровой Пума", "🦡 Реактивный Росомаха", "🐆 Ядовитый Ягуар", "🦔 Электрический Ёж", "🐗 Кибер Кабан",
+    "🦄 Ниндзя Нарвал", "🐧 Пиратский Пингвин", "🐨 Космо Коала", "🐆 Рок-н-ролл Рысь", "🦩 Панк Пеликан",
+    "🦡 Рэп Росомаха", "🦒 Джаз Жираф", "🦭 Техно Тюлень", "🦔 Диско Дикобраз", "🐹 Хип-хоп Хомяк"
+  ];
+
+  const fillRandomNames = () => {
+    const shuffled = shuffle([...NICKNAMES]);
+    const n = parseInt(count);
+    setNames(shuffled.slice(0, n));
+    setStep("names");
+  };
+
   const handleCountSubmit = () => {
     const n = parseInt(count);
     if (n >= 2 && n <= 20) { setNames(Array(n).fill("")); setStep("names"); }
@@ -3343,8 +3372,16 @@ function StartScreen({ onStart, onBack }) {
             background: validCount ? GRAD_WARM : "rgba(255,255,255,0.08)",
             color: validCount ? "#1a1a2e" : "rgba(255,255,255,0.2)", cursor: validCount ? "pointer" : "default"
           }
-        }, "Далее →")
-      )
+        }, "Ввести имена ✍️")
+      ),
+      validCount && e("button", {
+        onClick: fillRandomNames,
+        style: {
+          width: "100%", marginTop: "8px", padding: "14px", fontSize: "15px", fontWeight: 600,
+          borderRadius: "16px", border: "2px solid rgba(85,239,196,0.2)",
+          background: "rgba(85,239,196,0.06)", color: "#55efc4", cursor: "pointer"
+        }
+      }, "🎲 Без имён — рандомные прозвища")
     ),
 
     step === "names" && e("div", { className: "fade-in", style: { width: "100%", maxWidth: "340px" } },
@@ -3398,10 +3435,21 @@ function StartScreen({ onStart, onBack }) {
 }
 
 // ==================== DISTRIBUTE SCREEN ====================
+const MASCOTS = [
+  "🦫","🐧","🦊","🐸","🦄","🐙","🦥","🐨","🦇","🐷",
+  "🦎","🐔","🦩","🐳","🦜","🐻","🦝","🐲","🦈","🐵",
+  "🦧","🐊","🦬","🐺","🦦","🐘","🦘","🐝","🦂","🐌",
+  "🦑","🐞","🦗","🐡","🦚","🐢","🦕","🐠","🦃","🐋"
+];
+
 function DistributeScreen({ players, assignments, onDone }) {
   const [ci, setCi] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [taken, setTaken] = useState(new Set());
+  const [playerMascots] = useState(() => {
+    const shuffled = shuffle([...MASCOTS]);
+    return players.map((_, i) => shuffled[i % shuffled.length]);
+  });
 
   const player = players[ci];
   const words = assignments[player] || [];
@@ -3433,8 +3481,9 @@ function DistributeScreen({ players, assignments, onDone }) {
     e("div", { style: { color: "rgba(255,255,255,0.4)", fontSize: "13px", letterSpacing: "2px", textTransform: "uppercase", marginBottom: "8px" } },
       (ci + 1) + " / " + players.length),
     e("div", { style: { fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "6px", fontFamily: "-apple-system, system-ui, sans-serif" } }, "Передайте телефон:"),
+    e("div", { className: "float", style: { fontSize: "72px", marginBottom: "8px" } }, playerMascots[ci]),
     e("div", { className: "fade-in", style: {
-      fontSize: "clamp(28px,7vw,40px)", fontWeight: 900, marginBottom: "24px", textAlign: "center",
+      fontSize: "clamp(24px,6vw,36px)", fontWeight: 900, marginBottom: "24px", textAlign: "center",
       background: GRAD_NAME, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
     }}, player),
 
@@ -3487,9 +3536,14 @@ function GameScreen({ players: initialPlayers, assignments, penaltyDeck, onResta
   const [newName, setNewName] = useState("");
   const [newWordCount, setNewWordCount] = useState(5);
   const [newPlayerWords, setNewPlayerWords] = useState(null);
+  const [displayOrder, setDisplayOrder] = useState(null); // null = original order
 
   const players = gamePlayers;
-  const sorted = [...players].sort((a, b) => scores[a] - scores[b]);
+  const currentOrder = displayOrder || players;
+
+  const handleRank = () => {
+    setDisplayOrder([...players].sort((a, b) => scores[a] - scores[b]));
+  };
 
   const handleUsed = (p) => { if (scores[p] > 0) setScores(s => ({...s, [p]: s[p] - 1})); };
   const handleUndo = (p) => { setScores(s => ({...s, [p]: s[p] + 1})); };
@@ -3539,10 +3593,19 @@ function GameScreen({ players: initialPlayers, assignments, penaltyDeck, onResta
           "Штрафных слов: " + (penaltyDeck.length - penaltyIndex))
       ),
 
+      e("button", {
+        onClick: handleRank,
+        style: {
+          width: "100%", padding: "12px", fontSize: "14px", fontWeight: 600, borderRadius: "14px",
+          border: "2px solid rgba(254,202,87,0.2)", background: "rgba(254,202,87,0.06)",
+          color: "#feca57", cursor: "pointer", marginBottom: "12px"
+        }
+      }, "📊 Кто лидирует?"),
+
       e("div", { style: { marginBottom: "16px" } },
-        sorted.map((p, i) => {
+        currentOrder.map((p, i) => {
           const done = scores[p] === 0;
-          const medal = i === 0 && done ? "🥇" : i === 1 && done ? "🥈" : i === 2 && done ? "🥉" : null;
+          const medal = displayOrder ? (i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null) : null;
           return e("div", { key: p, style: {
             background: done ? "rgba(0,184,148,0.08)" : CARD_BG,
             borderRadius: "16px", padding: "12px 14px", marginBottom: "6px",
@@ -3969,16 +4032,27 @@ function App() {
     if (modes.includes("mat")) pool = pool.concat(WORDS_MAT);
     if (modes.includes("necenz")) pool = pool.concat(WORDS_NECENZ);
 
-    const totalNeeded = names.length * wpp + 200;
-    while (pool.length < totalNeeded) {
-      pool = [...pool, ...pool.map(w => w + " " + (Math.floor(Math.random() * 99) + 1))];
+    // Deduplicate pool
+    pool = [...new Set(pool)];
+    const totalNeeded = names.length * wpp + 500;
+    // Only expand if truly not enough unique words
+    if (pool.length < totalNeeded) {
+      let extra = 1;
+      while (pool.length < totalNeeded) {
+        const more = pool.map(w => w + " #" + extra);
+        pool = pool.concat(more);
+        extra++;
+      }
+      pool = [...new Set(pool)];
     }
     const shuffled = shuffle(pool);
+    // Each player gets a unique slice, no overlaps
     const pw = {}; let idx = 0;
     for (const name of names) { pw[name] = shuffled.slice(idx, idx + wpp); idx += wpp; }
     setPlayers(names);
     setAssignments(pw);
-    setPenaltyDeck(shuffled.slice(idx, idx + 200));
+    // Penalty/swap deck is also unique, no overlap with player words
+    setPenaltyDeck(shuffled.slice(idx, idx + 500));
     setScreen("distribute");
   };
 
