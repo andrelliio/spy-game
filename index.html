@@ -3474,15 +3474,21 @@ function DistributeScreen({ players, assignments, onDone }) {
 }
 
 // ==================== GAME SCREEN ====================
-function GameScreen({ players, assignments, penaltyDeck, onRestart, onFinish }) {
+function GameScreen({ players: initialPlayers, assignments, penaltyDeck, onRestart, onFinish }) {
+  const [gamePlayers, setGamePlayers] = useState(initialPlayers);
   const [scores, setScores] = useState(() =>
-    Object.fromEntries(players.map(p => [p, assignments[p].length]))
+    Object.fromEntries(initialPlayers.map(p => [p, assignments[p].length]))
   );
   const [penaltyIndex, setPenaltyIndex] = useState(0);
   const [penaltyReveal, setPenaltyReveal] = useState(null);
   const [swapReveal, setSwapReveal] = useState(null);
   const [showRules, setShowRules] = useState(false);
+  const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newWordCount, setNewWordCount] = useState(5);
+  const [newPlayerWords, setNewPlayerWords] = useState(null);
 
+  const players = gamePlayers;
   const sorted = [...players].sort((a, b) => scores[a] - scores[b]);
 
   const handleUsed = (p) => { if (scores[p] > 0) setScores(s => ({...s, [p]: s[p] - 1})); };
@@ -3499,6 +3505,23 @@ function GameScreen({ players, assignments, penaltyDeck, onRestart, onFinish }) 
     const word = penaltyDeck[penaltyIndex];
     setSwapReveal({ player: p, word });
     setPenaltyIndex(i => i + 1);
+  };
+  const handleAddPlayer = () => {
+    const name = newName.trim();
+    if (!name || players.includes(name)) return;
+    if (penaltyIndex + newWordCount > penaltyDeck.length) return;
+    const words = penaltyDeck.slice(penaltyIndex, penaltyIndex + newWordCount);
+    setPenaltyIndex(i => i + newWordCount);
+    setNewPlayerWords({ name, words });
+  };
+  const handleConfirmAdd = () => {
+    if (!newPlayerWords) return;
+    setGamePlayers(p => [...p, newPlayerWords.name]);
+    setScores(s => ({...s, [newPlayerWords.name]: newPlayerWords.words.length}));
+    setNewPlayerWords(null);
+    setNewName("");
+    setNewWordCount(5);
+    setShowAddPlayer(false);
   };
 
   return e("div", { style: { minHeight: "100vh", background: BG, padding: "20px 16px" } },
@@ -3618,13 +3641,22 @@ function GameScreen({ players, assignments, penaltyDeck, onRestart, onFinish }) 
       ),
 
       e("button", {
-        onClick: () => onFinish(scores),
+        onClick: () => onFinish(scores, players),
         style: {
           width: "100%", padding: "14px", fontSize: "15px", fontWeight: 700, borderRadius: "14px",
           border: "none", background: GRAD_WARM, color: "#1a1a2e", cursor: "pointer",
           marginBottom: "8px"
         }
       }, "🏁 Закончить игру"),
+
+      e("button", {
+        onClick: () => setShowAddPlayer(true),
+        style: {
+          width: "100%", padding: "12px", fontSize: "14px", fontWeight: 600, borderRadius: "14px",
+          border: "2px solid rgba(85,239,196,0.2)", background: "rgba(85,239,196,0.06)",
+          color: "#55efc4", cursor: "pointer", marginBottom: "8px"
+        }
+      }, "➕ Добавить игрока"),
 
       e("button", {
         onClick: onRestart,
@@ -3634,6 +3666,106 @@ function GameScreen({ players, assignments, penaltyDeck, onRestart, onFinish }) 
           color: "rgba(255,255,255,0.4)", cursor: "pointer"
         }
       }, "🔄 Новая игра")
+    ),
+
+    // Add player modal
+    showAddPlayer && !newPlayerWords && e("div", {
+      style: {
+        position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(12px)",
+        display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", zIndex: 100
+      }
+    },
+      e("div", {
+        className: "fade-in",
+        style: {
+          background: "linear-gradient(160deg, #1a1035, #0d1b2a)", borderRadius: "24px",
+          padding: "32px", maxWidth: "340px", width: "100%",
+          border: "1px solid rgba(85,239,196,0.2)", textAlign: "center"
+        }
+      },
+        e("div", { style: { fontSize: "36px", marginBottom: "12px" } }, "🆕"),
+        e("h3", { style: { fontSize: "18px", fontWeight: 900, marginBottom: "20px", color: "#55efc4" } }, "НОВЫЙ ИГРОК"),
+        e("input", {
+          type: "text", value: newName,
+          onChange: ev => setNewName(ev.target.value),
+          placeholder: "Имя",
+          style: {
+            width: "100%", padding: "14px", fontSize: "16px", borderRadius: "14px",
+            border: "2px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.06)",
+            color: "#fff", outline: "none", marginBottom: "12px", fontFamily: "-apple-system, system-ui, sans-serif"
+          }
+        }),
+        e("div", { style: { marginBottom: "16px" } },
+          e("label", { style: { color: "rgba(255,255,255,0.6)", fontSize: "13px", display: "block", marginBottom: "8px", fontFamily: "-apple-system, system-ui, sans-serif" } },
+            "Сколько слов: ", e("strong", { style: { color: "#feca57" } }, newWordCount)
+          ),
+          e("input", {
+            type: "range", min: 3, max: 10, value: newWordCount,
+            onChange: ev => setNewWordCount(parseInt(ev.target.value)),
+            style: { width: "100%", accentColor: "#55efc4" }
+          })
+        ),
+        e("div", { style: { display: "flex", gap: "8px" } },
+          e("button", {
+            onClick: () => { setShowAddPlayer(false); setNewName(""); },
+            style: {
+              flex: 1, padding: "14px", fontSize: "15px", fontWeight: 600, borderRadius: "14px",
+              border: "2px solid rgba(255,255,255,0.1)", background: "transparent",
+              color: "rgba(255,255,255,0.5)", cursor: "pointer"
+            }
+          }, "Отмена"),
+          e("button", {
+            onClick: handleAddPlayer,
+            disabled: !newName.trim() || players.includes(newName.trim()),
+            style: {
+              flex: 2, padding: "14px", fontSize: "15px", fontWeight: 700, borderRadius: "14px",
+              border: "none",
+              background: newName.trim() && !players.includes(newName.trim()) ? GRAD_GREEN : "rgba(255,255,255,0.08)",
+              color: newName.trim() && !players.includes(newName.trim()) ? "#1a1a2e" : "rgba(255,255,255,0.2)",
+              cursor: newName.trim() ? "pointer" : "default"
+            }
+          }, "Показать слова")
+        )
+      )
+    ),
+
+    // New player words reveal
+    newPlayerWords && e("div", {
+      style: {
+        position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", backdropFilter: "blur(12px)",
+        display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", zIndex: 100
+      }
+    },
+      e("div", {
+        className: "fade-in",
+        style: {
+          background: "linear-gradient(160deg, #1a1035, #0d1b2a)", borderRadius: "24px",
+          padding: "32px", maxWidth: "360px", width: "100%",
+          border: "1px solid rgba(85,239,196,0.2)", textAlign: "center"
+        }
+      },
+        e("div", { style: { fontSize: "14px", color: "rgba(255,255,255,0.4)", marginBottom: "4px", fontFamily: "-apple-system, system-ui, sans-serif" } }, "Слова для"),
+        e("div", { style: { fontSize: "24px", fontWeight: 900, marginBottom: "16px", color: "#55efc4" } }, newPlayerWords.name),
+        e("div", { style: {
+          background: CARD_BG, borderRadius: "16px", padding: "16px", border: CARD_BORDER, marginBottom: "16px", textAlign: "left"
+        }},
+          ...newPlayerWords.words.map((w, i) =>
+            e("div", { key: i, style: {
+              padding: "8px 12px", background: "rgba(255,255,255,0.04)", borderRadius: "8px",
+              marginBottom: "4px", color: "#fff", fontSize: "15px", fontWeight: 600,
+              borderLeft: "3px solid #55efc4", fontFamily: "-apple-system, system-ui, sans-serif"
+            }}, w)
+          )
+        ),
+        e("p", { style: { color: "#ff6b6b", fontSize: "13px", marginBottom: "16px" } }, "📸 Сфотографируй слова!"),
+        e("button", {
+          onClick: handleConfirmAdd,
+          style: {
+            width: "100%", padding: "14px", fontSize: "16px", fontWeight: 700, borderRadius: "14px",
+            border: "none", background: GRAD_GREEN, color: "#1a1a2e", cursor: "pointer"
+          }
+        }, "✅ Забрал!")
+      )
     ),
 
     // Penalty modal
@@ -3850,9 +3982,9 @@ function App() {
     setScreen("distribute");
   };
 
-  const restart = () => { setScreen("welcome"); setPlayers([]); setAssignments({}); setPenaltyDeck([]); setModes([]); setFinalScores({}); };
+  const restart = () => { setScreen("welcome"); setPlayers([]); setAssignments({}); setPenaltyDeck([]); setModes([]); setFinalScores({}); window.scrollTo(0,0); };
 
-  const handleFinish = (scores) => { setFinalScores(scores); setScreen("results"); };
+  const handleFinish = (scores, allPlayers) => { setFinalScores(scores); setPlayers(allPlayers); setScreen("results"); window.scrollTo(0,0); };
 
   if (screen === "welcome") return e(WelcomeScreen, { onContinue: () => setScreen("modes") });
   if (screen === "modes") return e(ModeSelectScreen, { onSelect: handleModeSelect, onBack: () => setScreen("welcome") });
